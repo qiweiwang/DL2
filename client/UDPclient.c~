@@ -1,0 +1,51 @@
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <time.h>
+#include <fcntl.h>
+
+int main()
+{
+    int sockfd =0, n=0, fd=0, r=0;
+    char recvBuff[1024];
+    struct sockaddr_in si_other;
+    int slen=sizeof(si_other);
+    
+
+    if((sockfd=socket(AF_INET,SOCK_DGRAM, IPPROTO_UDP))<0)
+    {
+        printf("ERROR SOCKET");
+        return;
+    }
+  
+    memset(&si_other,'0', sizeof(si_other));
+    si_other.sin_family = AF_INET;
+    si_other.sin_port = htons(5066);
+
+    if(inet_aton("192.168.2.3", &si_other.sin_addr)==0)
+    {
+         printf("ERROR!!\n");
+    }
+
+    while(1)
+    {
+        printf("before receiving\n");
+        r = recvfrom(sockfd, recvBuff,7,0,(struct sockaddr *)&si_other, &slen);
+        printf("after receiving\n");
+
+        if(r<0)
+            printf("ERROR, r = %d\n", r);
+        else
+        {
+            recvBuff[r]='\0';
+            printf("%s", recvBuff);
+        }
+    }
+
+}
